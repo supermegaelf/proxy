@@ -15,6 +15,8 @@ if [[ -z "$proxy_user" ]]; then
     exit 1
 fi
 
+echo -e "${GREEN}New password:${NC}"
+echo -e "${GREEN}Re-type new password:${NC}"
 sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
 read -p "$(echo -e "${GREEN}How many proxies do you need? ${NC}")" proxy_count
