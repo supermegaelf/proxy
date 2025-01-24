@@ -3,23 +3,23 @@
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y squid apache2-utils
 
-read -p "Введите имя пользователя для прокси: " proxy_user
+read -p "Enter user name for proxy: " proxy_user
 sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
-read -p "Сколько прокси вам нужно? " proxy_count
+read -p "How many proxies do you need? " proxy_count
 
 if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
-    echo "Ошибка: введите корректное число."
+    echo "Error: enter correct number."
     exit 1
 fi
 
-echo "Введите $proxy_count IP-адрес(а) для прокси через запятую (без пробелов)."
+echo "Enter $proxy_count IP address(es) for proxy, comma separated (no spaces)."
 read -p "IP-адреса: " ip_input
 
 IFS=',' read -r -a proxy_ips <<< "$ip_input"
 
 if [[ ${#proxy_ips[@]} -ne $proxy_count ]]; then
-    echo "Ошибка: количество IP-адресов (${#proxy_ips[@]}) не совпадает с количеством прокси ($proxy_count)."
+    echo "Error: number of IP addresses (${#proxy_ips[@]}) does not match number of proxies ($proxy_count)."
     exit 1
 fi
 
@@ -59,4 +59,4 @@ EOL
 
 sudo systemctl restart squid
 
-echo "Конфигурация завершена. Squid успешно настроен для $proxy_count прокси."
+echo "Configuration is complete. Squid successfully configured for $proxy_count proxy."
