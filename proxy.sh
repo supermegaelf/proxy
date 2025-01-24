@@ -1,36 +1,40 @@
 #!/bin/bash
 
-if [[ $EUID -ne 0 ]]; then
-    echo "Этот скрипт должен быть запущен с root-правами. Используйте sudo."
-    exit 1
-fi
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
 
-echo "Обновляем систему и устанавливаем необходимые пакеты..."
+echo -e "${GREEN}Upgrade system and install necessary packages...${NC}"
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y squid apache2-utils
 
-echo "Создаём пользователя для прокси..."
-read -p "Введите имя пользователя для прокси: " proxy_user
-sudo htpasswd -c /etc/squid/passwd "$proxy_user"
+read -p "$(echo -e "${GREEN}Enter username for proxy: ${NC}")" proxy_user
 
-read -p "Сколько прокси вам нужно? " proxy_count
-
-if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
-    echo "Ошибка: введите корректное число."
+if [[ -z "$proxy_user" ]]; then
+    echo -e "${RED}Error: username cannot be empty.${NC}"
     exit 1
 fi
 
-echo "Введите $proxy_count IP-адрес(а) для прокси через запятую (без пробелов):"
-read -p "IP-адреса: " ip_input
+sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
+read -p "$(echo -e "${GREEN}How many proxies do you need? ${NC}")" proxy_count
+
+if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
+    echo -e "${RED}Error: enter a valid number.${NC}"
+    exit 1
+fi
+
+read -p "$(echo -e "${GREEN}Enter $proxy_count IP address(es) for proxy in commas (no spaces): ${NC}")" ip_input
+
+ip_input=$(echo "$ip_input" | tr -d ' ')
 IFS=',' read -r -a proxy_ips <<< "$ip_input"
 
 if [[ ${#proxy_ips[@]} -ne $proxy_count ]]; then
-    echo "Ошибка: количество IP-адресов (${#proxy_ips[@]}) не совпадает с количеством прокси ($proxy_count)."
+    echo -e "${RED}Error: number of IP addresses (${#proxy_ips[@]}) doesn't match number of proxies ($proxy_count).${NC}"
     exit 1
 fi
 
-echo "Создаём конфигурацию Squid..."
+echo -e "${GREEN}Creating Squid configuration...${NC}"
 config_file="/etc/squid/squid.conf"
 echo "" > "$config_file"
 
@@ -67,4 +71,4 @@ EOL
 
 sudo systemctl restart squid
 
-echo "Конфигурация завершена. Squid успешно настроен для $proxy_count прокси."
+echo -e "${GREEN}Configuration is complete. Squid has been successfully configured for $proxy_count proxy.${NC}"
