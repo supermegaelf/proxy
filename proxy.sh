@@ -1,31 +1,34 @@
 #!/bin/bash
 
-echo "Upgrade system and install necessary packages..."
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+echo -e "${GREEN}Upgrade system and install necessary packages...${NC}"
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y squid apache2-utils
 
-echo "Create user for proxy..."
+echo -e "${GREEN}Create user for proxy...${NC}"
 read -p "Enter username for proxy: " proxy_user
 sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
 read -p "How many proxies do you need? " proxy_count
 
 if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
-    echo "Error: enter correct number."
+    echo -e "${GREEN}Error: enter correct number.${NC}"
     exit 1
 fi
 
-echo "Enter $proxy_count IP address(es) for proxy in commas (no spaces):"
+echo -e "${GREEN}Enter $proxy_count IP address(es) for proxy in commas (no spaces):${NC}"
 read -p "IP-адреса: " ip_input
 
 IFS=',' read -r -a proxy_ips <<< "$ip_input"
 
 if [[ ${#proxy_ips[@]} -ne $proxy_count ]]; then
-    echo "Error: number of IP addresses (${#proxy_ips[@]}) doesn't match number of proxies ($proxy_count)."
+    echo -e "${GREEN}Error: number of IP addresses (${#proxy_ips[@]}) doesn't match number of proxies ($proxy_count).${NC}"
     exit 1
 fi
 
-echo "Creating Squid configuration..."
+echo -e "${GREEN}Creating Squid configuration...${NC}"
 config_file="/etc/squid/squid.conf"
 echo "" > "$config_file"
 
@@ -60,7 +63,6 @@ header_access Via deny all
 header_access Cache-Control deny all
 EOL
 
-# Перезапускаем Squid
 sudo systemctl restart squid
 
-echo "Configuration is complete. Squid has been successfully configured for $proxy_count proxy."
+echo -e "${GREEN}Configuration is complete. Squid has been successfully configured for $proxy_count proxy.${NC}"
