@@ -14,7 +14,7 @@ if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
 fi
 
 echo "Enter $proxy_count IP address(es) for proxy, comma separated (no spaces)."
-read -p "IP-адреса: " ip_input
+read -p "IP addresses: " ip_input
 
 IFS=',' read -r -a proxy_ips <<< "$ip_input"
 
