@@ -1,35 +1,28 @@
 #!/bin/bash
 
-# Обновление и установка пакетов без вывода на экран
 sudo apt update -y > /dev/null 2>&1 && sudo apt upgrade -y > /dev/null 2>&1
 sudo apt install -y squid apache2-utils > /dev/null 2>&1
 
-# Ввод имени пользователя для прокси
 read -p "Enter user name for proxy: " proxy_user
 sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
-# Ввод количества прокси
 read -p "How many proxies do you need? " proxy_count
 
-# Проверка корректности введенного числа
 if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
     echo "Error: enter correct number."
     exit 1
 fi
 
-# Ввод IP-адресов прокси
 echo "Enter $proxy_count IP address(es) for proxy, comma separated (no spaces)."
 read -p "IP address(es): " ip_input
 
 IFS=',' read -r -a proxy_ips <<< "$ip_input"
 
-# Проверка совпадения количества IP с количеством прокси
 if [[ ${#proxy_ips[@]} -ne $proxy_count ]]; then
     echo "Error: number of IP addresses (${#proxy_ips[@]}) does not match number of proxies ($proxy_count)."
     exit 1
 fi
 
-# Настройка конфигурации Squid
 config_file="/etc/squid/squid.conf"
 echo "" > "$config_file"
 
@@ -40,7 +33,6 @@ for ((i = 0; i < proxy_count; i++)); do
     echo "tcp_outgoing_address ${proxy_ips[i]} port$((i + 1))" >> "$config_file"
 done
 
-# Завершающая часть конфигурации
 cat >> "$config_file" <<EOL
 
 cache deny all
@@ -65,8 +57,6 @@ header_access Via deny all
 header_access Cache-Control deny all
 EOL
 
-# Перезапуск Squid
 sudo systemctl restart squid > /dev/null 2>&1
 
-# Сообщение об окончании конфигурации
 echo "Configuration is complete. Squid successfully configured for $proxy_count proxy."
