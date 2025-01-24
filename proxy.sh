@@ -8,7 +8,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y squid apache2-utils
 
 echo -e "${GREEN}Create user for proxy...${NC}"
-read -p "Enter username for proxy: " proxy_user
+read -p "${GREEN}Enter username for proxy: ${NC}" proxy_user
 sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
 read -p "How many proxies do you need? " proxy_count
@@ -19,7 +19,7 @@ if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
 fi
 
 echo -e "${GREEN}Enter $proxy_count IP address(es) for proxy in commas (no spaces):${NC}"
-read -p "IP-адреса: " ip_input
+read -p "${GREEN}IP addresses: ${NC}" ip_input
 
 IFS=',' read -r -a proxy_ips <<< "$ip_input"
 
