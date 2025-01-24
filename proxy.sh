@@ -4,14 +4,12 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-# Обновление системы и установка пакетов
 echo -e "${GREEN}Upgrade system and install necessary packages...${NC}"
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y squid apache2-utils
 
-# Создание пользователя для прокси
-echo -e "${GREEN}Create user for proxy:${NC}"
-read -p "Enter username for proxy: " proxy_user
+echo -e "${GREEN}Enter username for proxy:${NC}"
+read -p " " proxy_user
 
 if [[ -z "$proxy_user" ]]; then
     echo -e "${RED}Error: username cannot be empty.${NC}"
@@ -20,7 +18,6 @@ fi
 
 sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
-# Количество прокси
 echo -e "${GREEN}How many proxies do you need?${NC}"
 read -p " " proxy_count
 
@@ -29,11 +26,9 @@ if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
     exit 1
 fi
 
-# Ввод IP-адресов
 echo -e "${GREEN}Enter $proxy_count IP address(es) for proxy in commas (no spaces):${NC}"
 read -p " " ip_input
 
-# Убираем пробелы и разделяем на массив
 ip_input=$(echo "$ip_input" | tr -d ' ')
 IFS=',' read -r -a proxy_ips <<< "$ip_input"
 
@@ -42,7 +37,6 @@ if [[ ${#proxy_ips[@]} -ne $proxy_count ]]; then
     exit 1
 fi
 
-# Создание конфигурации Squid
 echo -e "${GREEN}Creating Squid configuration...${NC}"
 config_file="/etc/squid/squid.conf"
 echo "" > "$config_file"
@@ -78,7 +72,6 @@ header_access Via deny all
 header_access Cache-Control deny all
 EOL
 
-# Перезапуск Squid
 sudo systemctl restart squid
 
 echo -e "${GREEN}Configuration is complete. Squid has been successfully configured for $proxy_count proxy.${NC}"
