@@ -3,7 +3,7 @@
 sudo apt update -y > /dev/null 2>&1 && sudo apt upgrade -y > /dev/null 2>&1
 sudo apt install -y squid apache2-utils > /dev/null 2>&1
 
-read -p "Enter user name for proxy: " proxy_user
+read -p "Enter username for proxy: " proxy_user
 sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
 read -p "How many proxies do you need? " proxy_count
