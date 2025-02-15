@@ -34,6 +34,7 @@ for ((i = 0; i < proxy_count; i++)); do
 done
 
 cat >> "$config_file" <<EOL
+max_filedescriptors 1048576
 
 cache deny all
 via off
