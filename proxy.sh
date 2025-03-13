@@ -3,6 +3,12 @@
 sudo apt update -y > /dev/null 2>&1 && sudo apt upgrade -y > /dev/null 2>&1
 sudo apt install -y squid apache2-utils > /dev/null 2>&1
 
+echo "Disabling IPv6..."
+sudo bash -c 'echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf'
+sudo bash -c 'echo "net.ipv6.conf.default.disable_ipv6=1" >> /etc/sysctl.conf'
+sudo bash -c 'echo "net.ipv6.conf.lo.disable_ipv6=1" >> /etc/sysctl.conf'
+sudo sysctl -p > /dev/null 2>&1
+
 read -p "Enter username for proxy: " proxy_user
 sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
