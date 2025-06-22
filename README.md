@@ -1,6 +1,6 @@
 ![#c5f015](https://placehold.co/10x10/c5f015/c5f015.png) **СКРИПТ** ![#c5f015](https://placehold.co/10x10/c5f015/c5f015.png)
 
-```
+```bash
 bash <(curl -s https://raw.githubusercontent.com/supermegaelf/proxy/main/proxy.sh)
 ```
 
