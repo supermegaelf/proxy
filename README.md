@@ -8,29 +8,26 @@ bash <(curl -s https://raw.githubusercontent.com/supermegaelf/proxy/main/proxy.s
 
 Обновить сервер и установить Squid:
 
-```
+```bash
 sudo apt update && apt upgrade -y
-```
-
-```
 sudo apt install squid -y
 ```
 
 Установить apache2-utils для настройки аутентификации:
 
-```
+```bash
 sudo apt install apache2-utils
 ```
 
 Открыть:
 
-```
+```bash
 nano /etc/sysctl.conf
 ```
 
 Добавить в конец следующие строки:
 
-```
+```bash
 net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1
@@ -38,19 +35,19 @@ net.ipv6.conf.lo.disable_ipv6=1
 
 Выполнить:
 
-```
+```bash
 sudo sysctl -p
 ```
 
 Создать пользователя для прокси, заменив `user` и ввести пароль для прокси:
 
-```
+```bash
 sudo htpasswd -c /etc/squid/passwd user
 ```
 
 Заменить содержимое `/etc/squid/squid.conf`, изменив `IP_адрес1`, `IP_адрес2`, `IP_адрес3` ..., и.т.д. на свои адреса:
 
-```
+```bash
 http_port IP_адрес1:24000
 http_port IP_адрес2:24001
 http_port IP_адрес3:24002
@@ -89,6 +86,6 @@ header_access Cache-Control deny all
 
 Перезапустить Squid:
 
-```
+```bash
 sudo systemctl restart squid
 ```
