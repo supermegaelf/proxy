@@ -45,7 +45,13 @@ sudo sysctl -p
 sudo htpasswd -c /etc/squid/passwd user
 ```
 
-Заменить содержимое `/etc/squid/squid.conf`, изменив `IP_адрес1`, `IP_адрес2`, `IP_адрес3` ..., и.т.д. на свои адреса:
+Открыть конфиг:
+
+```bash
+nano /etc/squid/squid.conf
+```
+
+Заменить содержимое `/etc/squid/squid.conf`, изменив `IP_адрес1`, `IP_адрес2`, `IP_адрес3` ..., и т.д. на свои адреса:
 
 ```bash
 http_port IP_адрес1:24000
