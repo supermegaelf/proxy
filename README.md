@@ -16,7 +16,7 @@ sudo apt install squid -y
 Установить apache2-utils для настройки аутентификации:
 
 ```bash
-sudo apt install apache2-utils
+sudo apt install apache2-utils -y
 ```
 
 Открыть:
