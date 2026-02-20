@@ -51,20 +51,20 @@ sudo htpasswd -c /etc/squid/passwd user
 nano /etc/squid/squid.conf
 ```
 
-Заменить содержимое `/etc/squid/squid.conf`, изменив `IP_адрес1`, `IP_адрес2`, `IP_адрес3` ..., и т.д. на свои адреса:
+Выпонить, заменив `IP_1`, `IP_2`, `IP_3` ..., и т.д. на свои адреса:
 
 ```bash
-http_port IP_адрес1:24000
-http_port IP_адрес2:24001
-http_port IP_адрес3:24002
+http_port IP_1:24000
+http_port IP_2:24001
+http_port IP_3:24002
 
 acl portA localport 24000
 acl portB localport 24001
 acl portC localport 24002
 
-tcp_outgoing_address IP_адрес1 portA
-tcp_outgoing_address IP_адрес2 portB
-tcp_outgoing_address IP_адрес3 portC
+tcp_outgoing_address IP_1 portA
+tcp_outgoing_address IP_2 portB
+tcp_outgoing_address IP_3 portC
 
 max_filedescriptors 1048576
 
