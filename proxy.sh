@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt update -y > /dev/null 2>&1 && sudo apt upgrade -y > /dev/null 2>&1
-sudo apt install -y squid apache2-utils > /dev/null 2>&1
+sudo apt install -y squid apache2-utils ufw > /dev/null 2>&1
 
 echo "Disabling IPv6..."
 sudo bash -c 'echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf'
@@ -9,15 +9,22 @@ sudo bash -c 'echo "net.ipv6.conf.default.disable_ipv6=1" >> /etc/sysctl.conf'
 sudo bash -c 'echo "net.ipv6.conf.lo.disable_ipv6=1" >> /etc/sysctl.conf'
 sudo sysctl -p > /dev/null 2>&1
 
-read -p "Enter username for proxy: " proxy_user
-sudo htpasswd -c /etc/squid/passwd "$proxy_user"
-
 read -p "How many proxies do you need? " proxy_count
 
 if ! [[ $proxy_count =~ ^[0-9]+$ ]]; then
     echo "Error: enter correct number."
     exit 1
 fi
+
+sudo ufw allow 22/tcp > /dev/null 2>&1
+for ((i = 0; i < proxy_count; i++)); do
+    port=$((24000 + i))
+    sudo ufw allow "$port/tcp" > /dev/null 2>&1
+done
+echo "y" | sudo ufw enable > /dev/null 2>&1
+
+read -p "Enter username for proxy: " proxy_user
+sudo htpasswd -c /etc/squid/passwd "$proxy_user"
 
 echo "Enter $proxy_count IP address(es) for proxy, comma separated (no spaces)."
 read -p "IP address(es): " ip_input
@@ -44,7 +51,6 @@ max_filedescriptors 1048576
 
 cache deny all
 via off
-dns_v4_first on
 
 auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
 acl auth_users proxy_auth REQUIRED
