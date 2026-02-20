@@ -6,36 +6,18 @@ bash <(curl -s https://raw.githubusercontent.com/supermegaelf/proxy/main/proxy.s
 
 ![#1589F0](https://placehold.co/10x10/1589F0/1589F0.png) **ВРУЧНУЮ** ![#1589F0](https://placehold.co/10x10/1589F0/1589F0.png)
 
-Обновить сервер и установить Squid:
-
 ```bash
 sudo apt update && apt upgrade -y
 sudo apt install squid -y
-```
-
-Установить apache2-utils для настройки аутентификации:
-
-```bash
 sudo apt install apache2-utils -y
 ```
 
-Открыть:
-
 ```bash
-nano /etc/sysctl.conf
-```
-
-Добавить в конец следующие строки:
-
-```bash
+sudo tee -a /etc/sysctl.conf << 'EOF'
 net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1
-```
-
-Выполнить:
-
-```bash
+EOF
 sudo sysctl -p
 ```
 
@@ -45,15 +27,10 @@ sudo sysctl -p
 sudo htpasswd -c /etc/squid/passwd user
 ```
 
-Открыть конфиг:
-
-```bash
-nano /etc/squid/squid.conf
-```
-
 Выпонить, заменив `IP_1`, `IP_2`, `IP_3` ..., и т.д. на свои адреса:
 
 ```bash
+cat > /etc/squid/squid.conf << 'EOF'
 http_port IP_1:24000
 http_port IP_2:24001
 http_port IP_3:24002
@@ -70,7 +47,6 @@ max_filedescriptors 1048576
 
 cache deny all
 via off
-dns_v4_first on
  
 auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
 acl auth_users proxy_auth REQUIRED
@@ -88,6 +64,7 @@ header_access Link deny all
 header_access X-Forwarded-For deny all
 header_access Via deny all
 header_access Cache-Control deny all
+EOF
 ```
 
 Перезапустить Squid:
