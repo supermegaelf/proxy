@@ -6,6 +6,8 @@ bash <(curl -s https://raw.githubusercontent.com/supermegaelf/proxy/main/proxy.s
 
 ![#1589F0](https://placehold.co/10x10/1589F0/1589F0.png) **ВРУЧНУЮ** ![#1589F0](https://placehold.co/10x10/1589F0/1589F0.png)
 
+
+
 ```bash
 sudo apt update && apt upgrade -y
 sudo apt install squid -y
@@ -20,6 +22,16 @@ net.ipv6.conf.lo.disable_ipv6=1
 EOF
 sudo sysctl -p
 ```
+
+```bash
+sudo apt install ufw -y
+sudo ufw allow 22/tcp
+sudo ufw allow 24000/tcp
+sudo ufw enable
+```
+
+> [!IMPORTANT]
+> Если портов несколько — добавить порт для каждого.
 
 Создать пользователя для прокси, заменив `user` и ввести пароль для прокси:
 
