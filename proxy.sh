@@ -223,5 +223,18 @@ setup_auth
 configure_squid
 
 echo
-echo -e "${GREEN}${CHECK}${NC} Configuration is complete. Squid successfully configured for ${WHITE}$proxy_count${NC} proxies."
+echo -e "${PURPLE}========================${NC}"
+echo -e "${GREEN}${CHECK}${NC} Installation complete"
+echo -e "${PURPLE}========================${NC}"
+echo
+echo -e "${CYAN}Proxy List:${NC}"
+for ((i = 0; i < proxy_count; i++)); do
+    port=$((24000 + i))
+    echo -e "${WHITE}${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${port}${NC}"
+done
+echo
+echo -e "${CYAN}Useful Commands:${NC}"
+echo -e "${WHITE}• View logs:   journalctl -u squid -f${NC}"
+echo -e "${WHITE}• View config: cat /etc/squid/squid.conf${NC}"
+echo -e "${WHITE}• Restart:     systemctl restart squid${NC}"
 echo
