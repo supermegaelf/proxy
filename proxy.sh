@@ -245,13 +245,16 @@ echo -e "${PURPLE}========================${NC}"
 echo -e "${GREEN}${CHECK}${NC} Installation complete"
 echo -e "${PURPLE}========================${NC}"
 echo
-echo -e "${CYAN}Proxy List:${NC}"
 for ((i = 0; i < proxy_count; i++)); do
     http_port=$((24000 + i))
     socks_port=$((25000 + i))
-    echo -e "${WHITE}HTTP:   http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
-    echo -e "${WHITE}HTTPS:  https://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
+    echo -e "${CYAN}Proxy List:${NC}"
+    echo -e "${WHITE}HTTP: http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
+    echo -e "${WHITE}HTTPS: https://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
     echo -e "${WHITE}SOCKS5: socks5://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${socks_port}${NC}"
+    echo
+    echo -e "${CYAN}Telegram:${NC}"
+    echo -e "${WHITE}SOCKS5 LINK: https://t.me/socks?server=${proxy_ips[i]}&port=${socks_port}&user=${proxy_user}&pass=${proxy_pass}${NC}"
     if (( i < proxy_count - 1 )); then
         echo
     fi
