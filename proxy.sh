@@ -25,6 +25,16 @@ error() {
     exit 1
 }
 
+section() {
+    local title="$1"
+    local line
+    line=$(printf '=%.0s' $(seq 1 ${#title}))
+    echo
+    echo -e "${WHITE}${title}${NC}"
+    echo -e "${WHITE}${line}${NC}"
+    echo
+}
+
 #==============
 # USER INPUT
 #==============
@@ -80,7 +90,8 @@ input_proxy_ips() {
 #================
 
 setup_system() {
-    echo -e "${CYAN}${INFO}${NC} Setting up system..."
+    section "System Setup"
+    echo -e "${CYAN}${INFO}${NC} Installing packages..."
     echo -e "${GRAY}  ${ARROW}${NC} Updating package lists"
     if ! apt-get update -y > /dev/null 2>&1; then
         error "Failed to update package list"
@@ -97,7 +108,7 @@ setup_system() {
     if ! apt-get install -y squid apache2-utils ufw > /dev/null 2>&1; then
         error "Failed to install packages"
     fi
-    echo -e "${GREEN}${CHECK}${NC} System setup complete"
+    echo -e "${GREEN}${CHECK}${NC} Packages installed successfully!"
 }
 
 #=================
@@ -105,6 +116,7 @@ setup_system() {
 #=================
 
 disable_ipv6() {
+    section "Network Setup"
     echo -e "${CYAN}${INFO}${NC} Disabling IPv6..."
     echo -e "${GRAY}  ${ARROW}${NC} Writing sysctl configuration"
     bash -c 'echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf'
@@ -112,7 +124,7 @@ disable_ipv6() {
     bash -c 'echo "net.ipv6.conf.lo.disable_ipv6=1" >> /etc/sysctl.conf'
     echo -e "${GRAY}  ${ARROW}${NC} Applying sysctl settings"
     sysctl -p > /dev/null 2>&1
-    echo -e "${GREEN}${CHECK}${NC} IPv6 disabled successfully"
+    echo -e "${GREEN}${CHECK}${NC} IPv6 disabled successfully!"
 }
 
 #==================
@@ -120,6 +132,7 @@ disable_ipv6() {
 #==================
 
 setup_firewall() {
+    section "Firewall Setup"
     echo -e "${CYAN}${INFO}${NC} Configuring firewall..."
     echo -e "${GRAY}  ${ARROW}${NC} Allowing SSH port"
     ufw allow 22/tcp > /dev/null 2>&1
@@ -130,7 +143,7 @@ setup_firewall() {
     done
     echo -e "${GRAY}  ${ARROW}${NC} Enabling firewall"
     echo "y" | ufw enable > /dev/null 2>&1
-    echo -e "${GREEN}${CHECK}${NC} Firewall configured successfully"
+    echo -e "${GREEN}${CHECK}${NC} Firewall configured successfully!"
 }
 
 #====================
@@ -138,10 +151,11 @@ setup_firewall() {
 #====================
 
 setup_auth() {
+    section "Proxy Authentication"
     echo -e "${CYAN}${INFO}${NC} Setting up proxy authentication..."
     echo -e "${GRAY}  ${ARROW}${NC} Creating password file for user ${WHITE}$proxy_user${NC}"
     printf '%s\n' "$proxy_pass" | htpasswd -i -c /etc/squid/passwd "$proxy_user" > /dev/null 2>&1
-    echo -e "${GREEN}${CHECK}${NC} Authentication configured successfully"
+    echo -e "${GREEN}${CHECK}${NC} Authentication configured successfully!"
 }
 
 #=====================
@@ -149,6 +163,7 @@ setup_auth() {
 #=====================
 
 configure_squid() {
+    section "Squid Configuration"
     echo -e "${CYAN}${INFO}${NC} Configuring Squid..."
     echo -e "${GRAY}  ${ARROW}${NC} Writing port and ACL rules"
     config_file="/etc/squid/squid.conf"
@@ -185,18 +200,22 @@ header_access Cache-Control deny all
 EOL
     echo -e "${GRAY}  ${ARROW}${NC} Restarting Squid service"
     systemctl restart squid > /dev/null 2>&1
-    echo -e "${GREEN}${CHECK}${NC} Squid configured and restarted successfully"
+    echo -e "${GREEN}${CHECK}${NC} Squid configured and restarted successfully!"
 }
 
 #========
 # MAIN
 #========
 
+echo
+echo -e "${WHITE}===============${NC}"
+echo -e "${WHITE}SQUID PROXY${NC}"
+echo -e "${WHITE}===============${NC}"
+
+section "Configuration Input"
 input_proxy_count
 input_proxy_credentials
 input_proxy_ips
-
-echo
 
 setup_system
 disable_ipv6
