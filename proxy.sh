@@ -51,24 +51,9 @@ input_proxy_count() {
     done
 }
 
-input_proxy_credentials() {
-    echo -ne "${CYAN}Enter username for proxy: ${NC}"
-    read proxy_user
-    while [[ -z "$proxy_user" ]]; do
-        echo -e "${RED}${CROSS}${NC} Username cannot be empty!"
-        echo
-        echo -ne "${CYAN}Enter username for proxy: ${NC}"
-        read proxy_user
-    done
-
-    echo -ne "${CYAN}Enter password for proxy: ${NC}"
-    read proxy_pass
-    while [[ -z "$proxy_pass" ]]; do
-        echo -e "${RED}${CROSS}${NC} Password cannot be empty!"
-        echo
-        echo -ne "${CYAN}Enter password for proxy: ${NC}"
-        read proxy_pass
-    done
+generate_credentials() {
+    proxy_user=$(tr -dc 'a-z0-9' < /dev/urandom | head -c 8)
+    proxy_pass=$(tr -dc 'a-z0-9' < /dev/urandom | head -c 8)
 }
 
 input_proxy_ips() {
@@ -189,8 +174,8 @@ echo -e "${PURPLE}==============${NC}"
 
 section "Configuration Input"
 input_proxy_count
-input_proxy_credentials
 input_proxy_ips
+generate_credentials
 
 setup_system
 disable_ipv6
