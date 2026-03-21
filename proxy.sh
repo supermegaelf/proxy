@@ -76,6 +76,14 @@ input_proxy_ips() {
 setup_system() {
     section "System Setup"
     echo -e "${CYAN}${INFO}${NC} Installing packages..."
+    echo -e "${GRAY}  ${ARROW}${NC} Updating package lists"
+    if ! apt-get update -y > /dev/null 2>&1; then
+        error "Failed to update package list"
+    fi
+    echo -e "${GRAY}  ${ARROW}${NC} Installing software-properties-common"
+    if ! apt-get install -y software-properties-common > /dev/null 2>&1; then
+        error "Failed to install software-properties-common"
+    fi
     echo -e "${GRAY}  ${ARROW}${NC} Enabling universe repository"
     if ! add-apt-repository universe -y > /dev/null 2>&1; then
         error "Failed to enable universe repository"
