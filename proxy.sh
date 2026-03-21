@@ -62,14 +62,12 @@ input_proxy_credentials() {
     done
 
     echo -ne "${CYAN}Enter password for proxy: ${NC}"
-    read -s proxy_pass
-    echo
+    read proxy_pass
     while [[ -z "$proxy_pass" ]]; do
         echo -e "${RED}${CROSS}${NC} Password cannot be empty!"
         echo
         echo -ne "${CYAN}Enter password for proxy: ${NC}"
-        read -s proxy_pass
-        echo
+        read proxy_pass
     done
 }
 
