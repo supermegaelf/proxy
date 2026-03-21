@@ -236,5 +236,4 @@ echo
 echo -e "${CYAN}Useful Commands:${NC}"
 echo -e "${WHITE}• View logs:   journalctl -u squid -f${NC}"
 echo -e "${WHITE}• View config: cat /etc/squid/squid.conf${NC}"
-echo -e "${WHITE}• Restart:     systemctl restart squid${NC}"
 echo
