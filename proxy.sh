@@ -9,6 +9,7 @@ readonly GREEN='\033[0;32m'
 readonly CYAN='\033[0;36m'
 readonly WHITE='\033[1;37m'
 readonly GRAY='\033[0;90m'
+readonly PURPLE='\033[0;35m'
 readonly NC='\033[0m'
 
 readonly CHECK="✓"
@@ -30,8 +31,8 @@ section() {
     local line
     line=$(printf '=%.0s' $(seq 1 ${#title}))
     echo
-    echo -e "${WHITE}${title}${NC}"
-    echo -e "${WHITE}${line}${NC}"
+    echo -e "${GREEN}${title}${NC}"
+    echo -e "${GREEN}${line}${NC}"
     echo
 }
 
@@ -208,9 +209,9 @@ EOL
 #========
 
 echo
-echo -e "${WHITE}===============${NC}"
+echo -e "${PURPLE}===============${NC}"
 echo -e "${WHITE}SQUID PROXY${NC}"
-echo -e "${WHITE}===============${NC}"
+echo -e "${PURPLE}===============${NC}"
 
 section "Configuration Input"
 input_proxy_count
