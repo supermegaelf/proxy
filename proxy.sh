@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sudo apt update -y > /dev/null 2>&1 && sudo apt upgrade -y > /dev/null 2>&1
+sudo apt install -y ubuntu-standard > /dev/null 2>&1
 sudo apt install -y squid apache2-utils ufw > /dev/null 2>&1
 
 echo "Disabling IPv6..."
