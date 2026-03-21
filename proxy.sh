@@ -57,15 +57,21 @@ generate_credentials() {
 }
 
 input_proxy_ips() {
-    echo -ne "${CYAN}Enter ${WHITE}$proxy_count${CYAN} IP address(es), comma separated (no spaces): ${NC}"
+    echo -ne "${CYAN}Enter ${WHITE}$proxy_count${CYAN} IP address(es), comma separated: ${NC}"
     read ip_input
     IFS=',' read -r -a proxy_ips <<< "$ip_input"
+    for i in "${!proxy_ips[@]}"; do
+        proxy_ips[$i]=$(echo "${proxy_ips[$i]}" | tr -d ' ')
+    done
     while [[ ${#proxy_ips[@]} -ne $proxy_count ]]; do
         echo -e "${RED}${CROSS}${NC} Number of IP addresses (${#proxy_ips[@]}) does not match number of proxies ($proxy_count)"
         echo
         echo -ne "${CYAN}IP address(es): ${NC}"
         read ip_input
         IFS=',' read -r -a proxy_ips <<< "$ip_input"
+        for i in "${!proxy_ips[@]}"; do
+            proxy_ips[$i]=$(echo "${proxy_ips[$i]}" | tr -d ' ')
+        done
     done
 }
 
