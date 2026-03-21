@@ -100,9 +100,13 @@ setup_system() {
     if ! apt-get install -y ubuntu-standard > /dev/null 2>&1; then
         error "Failed to install ubuntu-standard"
     fi
-    echo -e "${GRAY}  ${ARROW}${NC} Installing 3proxy and ufw"
-    if ! apt-get install -y 3proxy ufw > /dev/null 2>&1; then
-        error "Failed to install packages"
+    echo -e "${GRAY}  ${ARROW}${NC} Installing ufw"
+    if ! apt-get install -y ufw > /dev/null 2>&1; then
+        error "Failed to install ufw"
+    fi
+    echo -e "${GRAY}  ${ARROW}${NC} Installing 3proxy"
+    if ! apt-get install -y 3proxy > /dev/null 2>&1; then
+        error "Failed to install 3proxy"
     fi
     echo -e "${GREEN}${CHECK}${NC} Packages installed successfully!"
 }
