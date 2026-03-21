@@ -100,15 +100,56 @@ setup_system() {
     if ! apt-get install -y ubuntu-standard > /dev/null 2>&1; then
         error "Failed to install ubuntu-standard"
     fi
-    echo -e "${GRAY}  ${ARROW}${NC} Installing ufw"
-    if ! apt-get install -y ufw > /dev/null 2>&1; then
-        error "Failed to install ufw"
-    fi
-    echo -e "${GRAY}  ${ARROW}${NC} Installing 3proxy"
-    if ! apt-get install -y 3proxy > /dev/null 2>&1; then
-        error "Failed to install 3proxy"
+    echo -e "${GRAY}  ${ARROW}${NC} Installing ufw and build dependencies"
+    if ! apt-get install -y ufw build-essential curl wget > /dev/null 2>&1; then
+        error "Failed to install dependencies"
     fi
     echo -e "${GREEN}${CHECK}${NC} Packages installed successfully!"
+}
+
+#================
+# 3PROXY INSTALL
+#================
+
+install_3proxy() {
+    section "3proxy Installation"
+    echo -e "${CYAN}${INFO}${NC} Building 3proxy from source..."
+    echo -e "${GRAY}  ${ARROW}${NC} Fetching latest version"
+    local version
+    version=$(curl -s https://api.github.com/repos/3proxy/3proxy/releases/latest | grep -oP '"tag_name":\s*"\K[^"]+')
+    if [[ -z "$version" ]]; then
+        error "Failed to fetch 3proxy version from GitHub"
+    fi
+    echo -e "${GRAY}  ${ARROW}${NC} Downloading 3proxy ${version}"
+    if ! wget -q "https://github.com/3proxy/3proxy/archive/refs/tags/${version}.tar.gz" -O /tmp/3proxy.tar.gz; then
+        error "Failed to download 3proxy"
+    fi
+    echo -e "${GRAY}  ${ARROW}${NC} Compiling 3proxy"
+    cd /tmp && tar xzf 3proxy.tar.gz
+    cd "/tmp/3proxy-${version}"
+    if ! make -f Makefile.Linux > /dev/null 2>&1; then
+        error "Failed to compile 3proxy"
+    fi
+    cp bin/3proxy /usr/local/bin/3proxy
+    chmod +x /usr/local/bin/3proxy
+    echo -e "${GRAY}  ${ARROW}${NC} Creating systemd service"
+    cat > /etc/systemd/system/3proxy.service <<EOF
+[Unit]
+Description=3proxy Proxy Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/3proxy /etc/3proxy/3proxy.cfg
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    systemctl daemon-reload > /dev/null 2>&1
+    cd /root && rm -rf /tmp/3proxy.tar.gz /tmp/3proxy-*
+    echo -e "${GREEN}${CHECK}${NC} 3proxy built and installed successfully!"
 }
 
 #===============
@@ -194,6 +235,7 @@ input_proxy_ips
 generate_credentials
 
 setup_system
+install_3proxy
 disable_ipv6
 setup_firewall
 configure_3proxy
