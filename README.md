@@ -84,3 +84,7 @@ EOF
 ```bash
 sudo systemctl restart squid
 ```
+
+```bash
+journalctl -u squid -f
+```
