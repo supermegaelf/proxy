@@ -207,9 +207,9 @@ EOL
 #========
 
 echo
-echo -e "${PURPLE}===============${NC}"
+echo -e "${PURPLE}============${NC}"
 echo -e "${WHITE}SQUID PROXY${NC}"
-echo -e "${PURPLE}===============${NC}"
+echo -e "${PURPLE}============${NC}"
 
 section "Configuration Input"
 input_proxy_count
@@ -224,3 +224,4 @@ configure_squid
 
 echo
 echo -e "${GREEN}${CHECK}${NC} Configuration is complete. Squid successfully configured for ${WHITE}$proxy_count${NC} proxies."
+echo
