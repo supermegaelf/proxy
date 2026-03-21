@@ -248,7 +248,11 @@ echo
 for ((i = 0; i < proxy_count; i++)); do
     http_port=$((24000 + i))
     socks_port=$((25000 + i))
-    echo -e "${CYAN}Proxy List:${NC}"
+    if (( proxy_count == 1 )); then
+        echo -e "${CYAN}Proxy List:${NC}"
+    else
+        echo -e "${CYAN}Proxy $((i + 1)):${NC}"
+    fi
     echo -e "${WHITE}HTTP: http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
     echo -e "${WHITE}HTTPS: https://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
     echo -e "${WHITE}SOCKS5: socks5://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${socks_port}${NC}"
