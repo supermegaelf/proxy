@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#===============
+#==============
 # 3PROXY SETUP
-#===============
+#==============
 
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
@@ -17,9 +17,9 @@ readonly CROSS="✗"
 readonly INFO="*"
 readonly ARROW="→"
 
-#====================
+#===================
 # UTILITY FUNCTIONS
-#====================
+#===================
 
 error() {
     echo -e "${RED}${CROSS}${NC} $1"
@@ -36,9 +36,9 @@ section() {
     echo
 }
 
-#==============
+#============
 # USER INPUT
-#==============
+#============
 
 input_proxy_count() {
     echo -ne "${CYAN}How many proxies do you need? ${NC}"
@@ -69,9 +69,9 @@ input_proxy_ips() {
     done
 }
 
-#================
+#==============
 # SYSTEM SETUP
-#================
+#==============
 
 setup_system() {
     section "System Setup"
@@ -95,9 +95,9 @@ setup_system() {
     echo -e "${GREEN}${CHECK}${NC} Packages installed successfully!"
 }
 
-#=================
+#===============
 # NETWORK SETUP
-#=================
+#===============
 
 disable_ipv6() {
     section "Network Setup"
@@ -111,9 +111,9 @@ disable_ipv6() {
     echo -e "${GREEN}${CHECK}${NC} IPv6 disabled successfully!"
 }
 
-#==================
+#================
 # FIREWALL SETUP
-#==================
+#================
 
 setup_firewall() {
     section "Firewall Setup"
@@ -132,9 +132,9 @@ setup_firewall() {
     echo -e "${GREEN}${CHECK}${NC} Firewall configured successfully!"
 }
 
-#=====================
+#======================
 # 3PROXY CONFIGURATION
-#=====================
+#======================
 
 configure_3proxy() {
     section "3proxy Configuration"
@@ -163,14 +163,14 @@ EOL
     echo -e "${GREEN}${CHECK}${NC} 3proxy configured and restarted successfully!"
 }
 
-#========
+#======
 # MAIN
-#========
+#======
 
 echo
-echo -e "${PURPLE}==============${NC}"
+echo -e "${PURPLE}=============${NC}"
 echo -e "${WHITE}3PROXY SETUP${NC}"
-echo -e "${PURPLE}==============${NC}"
+echo -e "${PURPLE}=============${NC}"
 
 section "Configuration Input"
 input_proxy_count
