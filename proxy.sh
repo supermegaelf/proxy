@@ -222,7 +222,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/mtg run -b 0.0.0.0:${mtg_port} ${mtg_secret}
+ExecStart=/usr/local/bin/mtg simple-run 0.0.0.0:${mtg_port} ${mtg_secret}
 Restart=on-failure
 RestartSec=5
 
