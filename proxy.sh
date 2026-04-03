@@ -210,7 +210,7 @@ configure_mtg() {
     section "MTProto Configuration"
     echo -e "${CYAN}${INFO}${NC} Configuring MTProto proxy..."
     echo -e "${GRAY}  ${ARROW}${NC} Generating secret"
-    mtg_secret=$(/usr/local/bin/mtg generate-secret tls www.google.com)
+    mtg_secret=$(/usr/local/bin/mtg generate-secret --hex www.google.com)
     if [[ -z "$mtg_secret" ]]; then
         error "Failed to generate MTProto secret"
     fi
