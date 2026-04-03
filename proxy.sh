@@ -60,7 +60,7 @@ input_proxy_ips() {
     if (( proxy_count == 1 )); then
         echo -ne "${CYAN}Detecting server IP... ${NC}"
         local detected_ip
-        detected_ip=$(curl -s --max-time 5 ifconfig.me)
+        detected_ip=$(curl -4 -s --max-time 5 ifconfig.me)
         if [[ -z "$detected_ip" ]]; then
             error "Failed to detect server IP"
         fi
