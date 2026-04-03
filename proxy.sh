@@ -57,6 +57,17 @@ generate_credentials() {
 }
 
 input_proxy_ips() {
+    if (( proxy_count == 1 )); then
+        echo -ne "${CYAN}Detecting server IP... ${NC}"
+        local detected_ip
+        detected_ip=$(curl -4 -s --max-time 5 ifconfig.me)
+        if [[ -z "$detected_ip" ]]; then
+            error "Failed to detect server IP"
+        fi
+        proxy_ips=("$detected_ip")
+        echo -e "${WHITE}${detected_ip}${NC}"
+        return
+    fi
     echo -ne "${CYAN}Enter ${WHITE}$proxy_count${CYAN} IP address(es), comma separated: ${NC}"
     read ip_input
     IFS=',' read -r -a proxy_ips <<< "$ip_input"
@@ -158,6 +169,72 @@ EOF
     echo -e "${GREEN}${CHECK}${NC} 3proxy built and installed successfully!"
 }
 
+#=============
+# MTG INSTALL
+#=============
+
+install_mtg() {
+    section "MTProto Proxy (mtg)"
+    echo -e "${CYAN}${INFO}${NC} Installing mtg..."
+    echo -e "${GRAY}  ${ARROW}${NC} Fetching latest version"
+    local version
+    version=$(curl -s https://api.github.com/repos/9seconds/mtg/releases/latest | grep -oP '"tag_name":\s*"\K[^"]+')
+    if [[ -z "$version" ]]; then
+        error "Failed to fetch mtg version from GitHub"
+    fi
+    local arch
+    arch=$(uname -m)
+    case "$arch" in
+        x86_64)  arch="amd64" ;;
+        aarch64) arch="arm64" ;;
+        *) error "Unsupported architecture: $arch" ;;
+    esac
+    local version_no_v="${version#v}"
+    echo -e "${GRAY}  ${ARROW}${NC} Downloading mtg ${version}"
+    if ! wget -q "https://github.com/9seconds/mtg/releases/download/${version}/mtg-${version_no_v}-linux-${arch}.tar.gz" -O /tmp/mtg.tar.gz; then
+        error "Failed to download mtg"
+    fi
+    echo -e "${GRAY}  ${ARROW}${NC} Extracting mtg"
+    tar -xzf /tmp/mtg.tar.gz -C /tmp
+    cp "/tmp/mtg-${version_no_v}-linux-${arch}/mtg" /usr/local/bin/mtg
+    chmod +x /usr/local/bin/mtg
+    rm -rf /tmp/mtg.tar.gz "/tmp/mtg-${version_no_v}-linux-${arch}"
+    echo -e "${GREEN}${CHECK}${NC} mtg installed successfully!"
+}
+
+#======================
+# MTG CONFIGURATION
+#======================
+
+configure_mtg() {
+    section "MTProto Configuration"
+    echo -e "${CYAN}${INFO}${NC} Configuring MTProto proxy..."
+    echo -e "${GRAY}  ${ARROW}${NC} Generating secret"
+    mtg_secret=$(/usr/local/bin/mtg generate-secret --hex www.google.com)
+    if [[ -z "$mtg_secret" ]]; then
+        error "Failed to generate MTProto secret"
+    fi
+    echo -e "${GRAY}  ${ARROW}${NC} Creating systemd service"
+    cat > /etc/systemd/system/mtg.service <<EOF
+[Unit]
+Description=MTProto Proxy (mtg)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/mtg simple-run 0.0.0.0:${mtg_port} ${mtg_secret}
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    systemctl daemon-reload > /dev/null 2>&1
+    systemctl enable mtg > /dev/null 2>&1
+    systemctl restart mtg > /dev/null 2>&1
+    echo -e "${GREEN}${CHECK}${NC} MTProto proxy configured and started!"
+}
+
 #===============
 # NETWORK SETUP
 #===============
@@ -190,6 +267,7 @@ setup_firewall() {
         ufw allow "$http_port/tcp" > /dev/null 2>&1
         ufw allow "$socks_port/tcp" > /dev/null 2>&1
     done
+    ufw allow "${mtg_port}/tcp" > /dev/null 2>&1
     echo -e "${GRAY}  ${ARROW}${NC} Enabling firewall"
     echo "y" | ufw enable > /dev/null 2>&1
     echo -e "${GREEN}${CHECK}${NC} Firewall configured successfully!"
@@ -235,6 +313,8 @@ echo -e "${PURPLE}=============${NC}"
 echo -e "${WHITE}3PROXY SETUP${NC}"
 echo -e "${PURPLE}=============${NC}"
 
+readonly mtg_port=443
+
 section "Configuration Input"
 input_proxy_count
 input_proxy_ips
@@ -242,9 +322,14 @@ generate_credentials
 
 setup_system
 install_3proxy
+install_mtg
 disable_ipv6
 setup_firewall
 configure_3proxy
+configure_mtg
+
+output_file="/root/proxies.txt"
+> "$output_file"
 
 echo
 echo -e "${PURPLE}========================${NC}"
@@ -254,23 +339,44 @@ echo
 for ((i = 0; i < proxy_count; i++)); do
     http_port=$((24000 + i))
     socks_port=$((25000 + i))
+    tg_socks="https://t.me/socks?server=${proxy_ips[i]}&port=${socks_port}&user=${proxy_user}&pass=${proxy_pass}"
     if (( proxy_count == 1 )); then
         echo -e "${CYAN}Proxy List:${NC}"
+        {
+            echo "Proxy List:"
+        } >> "$output_file"
     else
         echo -e "${CYAN}Proxy $((i + 1)):${NC}"
+        {
+            echo "Proxy $((i + 1)):"
+        } >> "$output_file"
     fi
     echo -e "${WHITE}HTTP: http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
-    echo -e "${WHITE}HTTPS: https://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
+    echo -e "${WHITE}HTTPS: http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
     echo -e "${WHITE}SOCKS5: socks5://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${socks_port}${NC}"
+    tg_mtproto="https://t.me/proxy?server=${proxy_ips[i]}&port=${mtg_port}&secret=${mtg_secret}"
     echo
     echo -e "${CYAN}Telegram:${NC}"
-    echo -e "${WHITE}SOCKS5 LINK: https://t.me/socks?server=${proxy_ips[i]}&port=${socks_port}&user=${proxy_user}&pass=${proxy_pass}${NC}"
+    echo -e "${WHITE}SOCKS5: ${tg_socks}${NC}"
+    echo -e "${WHITE}MTProto: ${tg_mtproto}${NC}"
+    {
+        echo "HTTP:    http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}"
+        echo "HTTPS:   http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}"
+        echo "SOCKS5:  socks5://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${socks_port}"
+        echo ""
+        echo "Telegram:"
+        echo "SOCKS5:  ${tg_socks}"
+        echo "MTProto: ${tg_mtproto}"
+    } >> "$output_file"
     if (( i < proxy_count - 1 )); then
         echo
+        echo "" >> "$output_file"
     fi
 done
 echo
 echo -e "${CYAN}Useful Commands:${NC}"
-echo -e "${WHITE}• View logs: journalctl -u 3proxy -f${NC}"
+echo -e "${WHITE}• View logs (3proxy): journalctl -u 3proxy -f${NC}"
+echo -e "${WHITE}• View logs (mtg): journalctl -u mtg -f${NC}"
 echo -e "${WHITE}• View config: cat /etc/3proxy/3proxy.cfg${NC}"
+echo -e "${WHITE}• View proxies: cat ${output_file}${NC}"
 echo
