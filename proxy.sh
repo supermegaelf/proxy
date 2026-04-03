@@ -354,29 +354,25 @@ for ((i = 0; i < proxy_count; i++)); do
     echo -e "${WHITE}HTTP: http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
     echo -e "${WHITE}HTTPS: http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}${NC}"
     echo -e "${WHITE}SOCKS5: socks5://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${socks_port}${NC}"
+    tg_mtproto="https://t.me/proxy?server=${proxy_ips[i]}&port=${mtg_port}&secret=${mtg_secret}"
     echo
     echo -e "${CYAN}Telegram:${NC}"
-    echo -e "${WHITE}SOCKS5 LINK: ${tg_socks}${NC}"
+    echo -e "${WHITE}SOCKS5: ${tg_socks}${NC}"
+    echo -e "${WHITE}MTProto: ${tg_mtproto}${NC}"
     {
-        echo "HTTP:   http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}"
-        echo "HTTPS:  http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}"
-        echo "SOCKS5: socks5://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${socks_port}"
+        echo "HTTP:    http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}"
+        echo "HTTPS:   http://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${http_port}"
+        echo "SOCKS5:  socks5://${proxy_user}:${proxy_pass}@${proxy_ips[i]}:${socks_port}"
         echo ""
-        echo "Telegram SOCKS5: ${tg_socks}"
+        echo "Telegram:"
+        echo "SOCKS5:  ${tg_socks}"
+        echo "MTProto: ${tg_mtproto}"
     } >> "$output_file"
     if (( i < proxy_count - 1 )); then
         echo
         echo "" >> "$output_file"
     fi
 done
-tg_mtproto="https://t.me/proxy?server=${proxy_ips[0]}&port=${mtg_port}&secret=${mtg_secret}"
-echo -e "${CYAN}MTProto:${NC}"
-echo -e "${WHITE}LINK: ${tg_mtproto}${NC}"
-{
-    echo ""
-    echo "MTProto:"
-    echo "LINK: ${tg_mtproto}"
-} >> "$output_file"
 echo
 echo -e "${CYAN}Useful Commands:${NC}"
 echo -e "${WHITE}• View logs (3proxy): journalctl -u 3proxy -f${NC}"
