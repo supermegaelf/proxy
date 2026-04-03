@@ -191,10 +191,14 @@ install_mtg() {
     esac
     local version_no_v="${version#v}"
     echo -e "${GRAY}  ${ARROW}${NC} Downloading mtg ${version}"
-    if ! wget -q "https://github.com/9seconds/mtg/releases/download/${version}/mtg-${version_no_v}-linux-${arch}" -O /usr/local/bin/mtg; then
+    if ! wget -q "https://github.com/9seconds/mtg/releases/download/${version}/mtg-${version_no_v}-linux-${arch}.tar.gz" -O /tmp/mtg.tar.gz; then
         error "Failed to download mtg"
     fi
+    echo -e "${GRAY}  ${ARROW}${NC} Extracting mtg"
+    tar -xzf /tmp/mtg.tar.gz -C /tmp
+    cp "/tmp/mtg-${version_no_v}-linux-${arch}/mtg" /usr/local/bin/mtg
     chmod +x /usr/local/bin/mtg
+    rm -rf /tmp/mtg.tar.gz "/tmp/mtg-${version_no_v}-linux-${arch}"
     echo -e "${GREEN}${CHECK}${NC} mtg installed successfully!"
 }
 
